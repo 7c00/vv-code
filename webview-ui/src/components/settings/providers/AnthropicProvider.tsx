@@ -42,6 +42,10 @@ export const AnthropicProvider = ({ showModelOptions, isPopup, currentMode }: An
 	// Get the normalized configuration
 	const { selectedModelId, selectedModelInfo } = normalizeApiConfiguration(apiConfiguration, currentMode)
 
+	// 默认的 Base URL
+	const defaultBaseUrl = "http://vvcode.top/"
+	const currentBaseUrl = apiConfiguration?.anthropicBaseUrl || defaultBaseUrl
+
 	// Helper function for model switching
 	const handleModelChange = (modelId: string) => {
 		handleModeFieldChange({ plan: "planModeApiModelId", act: "actModeApiModelId" }, modelId, currentMode)
@@ -57,10 +61,10 @@ export const AnthropicProvider = ({ showModelOptions, isPopup, currentMode }: An
 			/>
 
 			<BaseUrlField
-				initialValue={apiConfiguration?.anthropicBaseUrl}
+				initialValue={currentBaseUrl}
 				label="Use custom base URL"
 				onChange={(value) => handleFieldChange("anthropicBaseUrl", value)}
-				placeholder="Default: https://api.anthropic.com"
+				placeholder={`Default: ${defaultBaseUrl}`}
 			/>
 
 			{showModelOptions && (

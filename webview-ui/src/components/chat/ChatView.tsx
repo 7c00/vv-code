@@ -13,6 +13,7 @@ import { useExtensionState } from "@/context/ExtensionStateContext"
 import { useShowNavbar } from "@/context/PlatformContext"
 import { FileServiceClient, UiServiceClient } from "@/services/grpc-client"
 import { Navbar } from "../menu/Navbar"
+import VVWelcomeView from "../onboarding/VVWelcomeView"
 import AutoApproveBar from "./auto-approve-menu/AutoApproveBar"
 // Import utilities and hooks from the new structure
 import {
@@ -28,35 +29,18 @@ import {
 	useChatState,
 	useMessageHandlers,
 	useScrollBehavior,
-	WelcomeSection,
 } from "./chat-view"
 
 interface ChatViewProps {
 	isHidden: boolean
-	showAnnouncement: boolean
-	hideAnnouncement: () => void
-	showHistoryView: () => void
 }
 
 // Use constants from the imported module
 const MAX_IMAGES_AND_FILES_PER_MESSAGE = CHAT_CONSTANTS.MAX_IMAGES_AND_FILES_PER_MESSAGE
-const QUICK_WINS_HISTORY_THRESHOLD = 3
 
-const ChatView = ({ isHidden, showAnnouncement, hideAnnouncement, showHistoryView }: ChatViewProps) => {
+const ChatView = ({ isHidden }: ChatViewProps) => {
 	const showNavbar = useShowNavbar()
-	const {
-		version,
-		clineMessages: messages,
-		taskHistory,
-		apiConfiguration,
-		telemetrySetting,
-		mode,
-		userInfo,
-		currentFocusChainChecklist,
-		hooksEnabled,
-	} = useExtensionState()
-	const isProdHostedApp = userInfo?.apiBaseUrl === "https://app.cline.bot"
-	const shouldShowQuickWins = isProdHostedApp && (!taskHistory || taskHistory.length < QUICK_WINS_HISTORY_THRESHOLD)
+	const { clineMessages: messages, apiConfiguration, mode, currentFocusChainChecklist, hooksEnabled } = useExtensionState()
 
 	//const task = messages.length > 0 ? (messages[0].say === "task" ? messages[0] : undefined) : undefined) : undefined
 	const task = useMemo(() => messages.at(0), [messages]) // leaving this less safe version here since if the first message is not a task, then the extension is in a bad state and needs to be debugged (see Cline.abort)
@@ -352,15 +336,7 @@ const ChatView = ({ isHidden, showAnnouncement, hideAnnouncement, showHistoryVie
 						task={task}
 					/>
 				) : (
-					<WelcomeSection
-						hideAnnouncement={hideAnnouncement}
-						shouldShowQuickWins={shouldShowQuickWins}
-						showAnnouncement={showAnnouncement}
-						showHistoryView={showHistoryView}
-						taskHistory={taskHistory}
-						telemetrySetting={telemetrySetting}
-						version={version}
-					/>
+					<VVWelcomeView />
 				)}
 				{task && (
 					<MessagesArea

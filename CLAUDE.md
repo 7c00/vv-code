@@ -129,10 +129,29 @@ git cherry-pick <commit-hash>
 // Modified: 2025-01-xx
 ```
 
-**3. 分离定制代码**
+**3. 分离定制代码和命名规范**
+
+**命名规范（强制）：**
+- ✅ **所有二次开发新增的组件/文件必须以 `vv` 或 `VV` 开头**
+  - React 组件：`VVWelcomeView.tsx`, `VVCustomButton.tsx`
+  - 工具函数：`vvUtils.ts`, `vvHelper.ts`
+  - 样式文件：`vv-styles.css`
+  - API 文件：`vv-api.ts`
+- ✅ **修改现有文件时，在文件顶部添加注释标记**：
+  ```typescript
+  // VVCode Customization: [简短说明修改内容]
+  // Original: Cline v2.x
+  // Modified: YYYY-MM-DD
+  ```
+- ❌ **不要修改现有文件名**（除非是 README.md → README.vvcode.md 这种情况）
+
+**文件组织：**
 - 将自定义代码尽量放在独立的文件中
-- 使用命名空间或前缀（如 `vvcode-`, `custom-`）
-- 在 `src/exports/` 或 `src/integrations/` 下创建独立模块
+- 新增的独立模块放在：
+  - `src/exports/vv-*` - 导出的自定义功能
+  - `src/integrations/vv-*` - 第三方服务集成
+  - `webview-ui/src/components/vv-*` - 自定义 UI 组件
+- 避免分散在原有目录结构中
 
 ### 开发工作流
 
