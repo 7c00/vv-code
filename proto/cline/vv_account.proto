@@ -1,0 +1,61 @@
+// VVCode Customization: VVCode 用户认证服务
+// Created: 2025-12-20
+
+syntax = "proto3";
+
+package cline;
+
+import "cline/common.proto";
+
+option go_package = "github.com/cline/grpc-go/cline";
+option java_multiple_files = true;
+option java_package = "bot.cline.proto";
+
+// VVCode 账户服务
+service VVAccountService {
+  // 用户点击登录按钮
+  // 生成 PKCE 参数，打开浏览器跳转到 vvcode.top
+  rpc vvAccountLoginClicked(EmptyRequest) returns (String);
+
+  // 用户点击登出按钮
+  // 清除所有认证信息和用户状态
+  rpc vvAccountLogoutClicked(EmptyRequest) returns (Empty);
+
+  // 订阅认证状态更新
+  // 当用户登录/登出时，WebView 会收到实时通知
+  rpc vvSubscribeToAuthStatusUpdate(EmptyRequest) returns (stream VVAuthState);
+
+  // 获取用户配置（可选）
+  rpc vvGetUserConfig(EmptyRequest) returns (VVUserConfig);
+}
+
+// VVCode 认证状态
+message VVAuthState {
+  optional VVUserInfo user = 1;
+  optional string access_token = 2;
+}
+
+// VVCode 用户信息
+message VVUserInfo {
+  string uid = 1;
+  optional string username = 2;
+  optional string email = 3;
+  optional string avatar_url = 4;
+  optional int64 created_at = 5;
+  optional int32 quota = 6; // 用户配额
+  optional int32 used_quota = 7; // 已使用配额
+  optional int32 vip_level = 8; // VIP 等级
+}
+
+// VVCode 用户配置
+message VVUserConfig {
+  repeated VVConfigEntry settings = 1; // 配置项列表（替代 map）
+  repeated string features = 2; // 开启的功能列表
+  optional string api_base_url = 3; // API 基础 URL
+}
+
+// VVCode 配置项
+message VVConfigEntry {
+  string key = 1;
+  string value = 2;
+}

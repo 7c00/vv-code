@@ -7,12 +7,12 @@ import SettingsView from "./components/settings/SettingsView"
 import VVSettingsView from "./components/settings/VVSettingsView" // VVCode Customization: 添加 VV 设置页面
 import { useClineAuth } from "./context/ClineAuthContext"
 import { useExtensionState } from "./context/ExtensionStateContext"
+import { useVVAuth } from "./hooks/useVVAuth" // VVCode Customization: 添加 VV 认证
 import { Providers } from "./Providers"
 
 const AppContent = () => {
 	const {
 		didHydrateState,
-		showWelcome,
 		showMcp,
 		mcpTab,
 		showSettings,
@@ -29,11 +29,15 @@ const AppContent = () => {
 
 	const { clineUser, organizations, activeOrganization } = useClineAuth()
 
-	if (!didHydrateState) {
+	// VVCode Customization: 检查 VV 认证状态
+	const { isAuthenticated: isVVAuthenticated, ready: vvAuthReady } = useVVAuth()
+
+	if (!didHydrateState || !vvAuthReady) {
 		return null
 	}
 
-	if (showWelcome) {
+	// VVCode Customization: 未登录 VV 时显示登录页
+	if (!isVVAuthenticated) {
 		return <VVWelcomeView />
 	}
 

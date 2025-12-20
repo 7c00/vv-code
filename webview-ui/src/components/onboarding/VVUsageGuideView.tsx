@@ -1,7 +1,10 @@
 import { useEffect } from "react"
+import { useVVAuth } from "@/hooks/useVVAuth"
 import { StateServiceClient } from "@/services/grpc-client"
 
 const VVUsageGuideView = () => {
+	const { isAuthenticated, user } = useVVAuth()
+
 	useEffect(() => {
 		// 页面加载时自动标记欢迎流程完成
 		StateServiceClient.setWelcomeViewCompleted({ value: true }).catch(() => {})
@@ -15,7 +18,9 @@ const VVUsageGuideView = () => {
 
 				{/* 描述 */}
 				<p className="text-sm font-light text-foreground/60 text-center max-w-md mb-10 leading-relaxed">
-					AI 驱动的智能编程助手，所有操作安全可控
+					{isAuthenticated && user
+						? `你好，「${user.username}」，我是 VVCode，你的 AI 编程助手，随时为你效劳 ✨`
+						: "AI 驱动的智能编程助手，所有操作安全可控"}
 				</p>
 
 				{/* 使用指南卡片 */}

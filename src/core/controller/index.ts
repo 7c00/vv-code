@@ -30,6 +30,8 @@ import { ExtensionRegistryInfo } from "@/registry"
 import { AuthService } from "@/services/auth/AuthService"
 import { OcaAuthService } from "@/services/auth/oca/OcaAuthService"
 import { LogoutReason } from "@/services/auth/types"
+// VVCode Customization: 导入 VVAuthService
+import { VVAuthService } from "@/services/auth/vv/VVAuthService"
 import { featureFlagsService } from "@/services/feature-flags"
 import { getDistinctId } from "@/services/logging/distinctId"
 import { telemetryService } from "@/services/telemetry"
@@ -69,6 +71,8 @@ export class Controller {
 	accountService: ClineAccountService
 	authService: AuthService
 	ocaAuthService: OcaAuthService
+	// VVCode Customization: VVCode 认证服务
+	vvAuthService: import("@/services/auth/vv/VVAuthService").VVAuthService
 	readonly stateManager: StateManager
 
 	// NEW: Add workspace manager (optional initially)
@@ -141,6 +145,8 @@ export class Controller {
 		})
 		this.authService = AuthService.getInstance(this)
 		this.ocaAuthService = OcaAuthService.initialize(this)
+		// VVCode Customization: 初始化 VVAuthService
+		this.vvAuthService = VVAuthService.initialize(this)
 		this.accountService = ClineAccountService.getInstance()
 
 		this.authService.restoreRefreshTokenAndRetrieveAuthInfo().then(() => {
@@ -708,6 +714,30 @@ export class Controller {
 			this.task.api = buildApiHandler({ ...updatedConfig, ulid: this.task.ulid }, currentMode)
 		}
 		// Dont send settingsButtonClicked because its bad ux if user is on welcome
+	}
+
+	// VVCode Customization: VVCode 认证回调处理
+	async handleVVAuthCallback(code: string, state: string) {
+		try {
+			await this.vvAuthService.handleAuthCallback(code, state)
+
+			// Mark welcome view as completed since user has successfully logged in
+			this.stateManager.setGlobalState("welcomeViewCompleted", true)
+
+			await this.postStateToWebview()
+
+			const userInfo = this.vvAuthService.getUserInfo()
+			HostProvider.window.showMessage({
+				type: ShowMessageType.INFORMATION,
+				message: `Successfully logged in to VVCode! Welcome, ${userInfo?.username || "User"}`,
+			})
+		} catch (error) {
+			console.error("Failed to handle VVCode auth callback:", error)
+			HostProvider.window.showMessage({
+				type: ShowMessageType.ERROR,
+				message: `Failed to log in to VVCode: ${error instanceof Error ? error.message : String(error)}`,
+			})
+		}
 	}
 
 	// Requesty

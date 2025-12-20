@@ -16,7 +16,7 @@ const activeVVSettingsButtonClickedSubscriptions = new Set<StreamingResponseHand
  * @param responseStream The streaming response handler
  * @param requestId The ID of the request (passed by the gRPC handler)
  */
-export async function subscribeToVVSettingsButtonClicked(
+export async function subscribeToVvSettingsButtonClicked(
 	_controller: Controller,
 	_request: EmptyRequest,
 	responseStream: StreamingResponseHandler<Empty>,

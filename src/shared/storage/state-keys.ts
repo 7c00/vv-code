@@ -59,6 +59,31 @@ export interface GlobalState {
 	remoteRulesToggles: ClineRulesToggles
 	remoteWorkflowToggles: ClineRulesToggles
 	dismissedBanners: Array<{ bannerId: string; dismissedAt: number }>
+	// VVCode Customization: VVCode 用户信息
+	vvUserInfo: VVUserInfo | undefined
+	vvUserConfig: VVUserConfig | undefined
+	// VVCode Customization: 临时认证数据（仅在认证流程中使用）
+	"vv:authState": string | undefined
+	"vv:codeVerifier": string | undefined
+}
+
+// VVCode Customization: VVCode 用户信息类型
+export interface VVUserInfo {
+	uid: string
+	username?: string
+	email?: string
+	avatarUrl?: string
+	createdAt?: number
+	quota?: number
+	usedQuota?: number
+	vipLevel?: number
+}
+
+// VVCode Customization: VVCode 用户配置类型
+export interface VVUserConfig {
+	settings?: Array<{ key: string; value: string }> // 改为数组形式
+	features?: string[]
+	apiBaseUrl?: string
 }
 
 export interface Settings {
@@ -271,6 +296,12 @@ export interface Secrets {
 	aihubmixApiKey: string | undefined
 	mcpOAuthSecrets: string | undefined
 	nousResearchApiKey: string | undefined
+	// VVCode Customization: VVCode 认证相关密钥
+	"vv:accessToken": string | undefined // VVCode 访问令牌
+	"vv:refreshToken": string | undefined // VVCode 刷新令牌
+	"vv:userId": string | undefined // VVCode 用户 ID
+	"vv:authState": string | undefined // CSRF 防护 state（临时）- 已迁移到 GlobalState
+	"vv:codeVerifier": string | undefined // PKCE code_verifier（临时）- 已迁移到 GlobalState
 }
 
 export interface LocalState {

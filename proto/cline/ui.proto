@@ -250,7 +250,7 @@ service UiService {
   rpc subscribeToSettingsButtonClicked(EmptyRequest) returns (stream Empty);
 
   // VVCode Customization: Subscribe to VV settings button clicked events
-  rpc subscribeToVVSettingsButtonClicked(EmptyRequest) returns (stream Empty);
+  rpc subscribeToVvSettingsButtonClicked(EmptyRequest) returns (stream Empty);
 
   // Subscribe to partial message updates (streaming Cline messages as they're built)
   rpc subscribeToPartialMessage(EmptyRequest) returns (stream ClineMessage);

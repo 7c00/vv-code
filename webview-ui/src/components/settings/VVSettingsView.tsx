@@ -4,6 +4,7 @@
 
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react"
 import { useExtensionState } from "@/context/ExtensionStateContext"
+import { useVVAuth } from "@/hooks/useVVAuth"
 import { getEnvironmentColor } from "@/utils/environmentColors"
 
 interface VVSettingsViewProps {
@@ -15,6 +16,7 @@ interface VVSettingsViewProps {
  */
 const VVSettingsView = ({ onDone }: VVSettingsViewProps) => {
 	const { environment } = useExtensionState()
+	const { user, isAuthenticated, logout } = useVVAuth()
 
 	return (
 		<div className="fixed overflow-hidden inset-0 flex flex-col">
@@ -39,13 +41,31 @@ const VVSettingsView = ({ onDone }: VVSettingsViewProps) => {
 			{/* Content */}
 			<div style={{ padding: "5px 17px 6px 20px", flex: 1, overflow: "auto" }}>
 				<div style={{ maxWidth: "600px" }}>
+					{/* 账户信息 */}
+					{isAuthenticated && user && (
+						<div className="mb-6">
+							<h4 className="text-sm font-medium mb-3">账户</h4>
+							<div className="p-4 border border-input-border rounded bg-input-background">
+								<div className="flex items-center justify-between">
+									<div>
+										<p className="text-sm font-medium">{user.username}</p>
+										<p className="text-xs text-(--vscode-descriptionForeground)">UID: {user.uid}</p>
+									</div>
+									<VSCodeButton appearance="secondary" onClick={logout}>
+										退出登录
+									</VSCodeButton>
+								</div>
+							</div>
+						</div>
+					)}
+
 					<p
 						style={{
 							fontSize: "13px",
 							marginTop: "15px",
 							color: "var(--vscode-descriptionForeground)",
 						}}>
-						暂无可配置项
+						更多设置项即将推出
 					</p>
 				</div>
 			</div>

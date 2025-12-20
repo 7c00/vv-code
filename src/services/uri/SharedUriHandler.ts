@@ -43,7 +43,7 @@ export class SharedUriHandler {
 						await visibleWebview.controller.handleOpenRouterCallback(code)
 						return true
 					}
-					console.warn("SharedUriHandler: Missing code parameter for OpenRouter callback")
+					Logger.warn("SharedUriHandler: Missing code parameter for OpenRouter callback")
 					return false
 				}
 				case "/requesty": {
@@ -52,7 +52,7 @@ export class SharedUriHandler {
 						await visibleWebview.controller.handleRequestyCallback(code)
 						return true
 					}
-					console.warn("SharedUriHandler: Missing code parameter for Requesty callback")
+					Logger.warn("SharedUriHandler: Missing code parameter for Requesty callback")
 					return false
 				}
 				case "/auth": {
@@ -69,7 +69,7 @@ export class SharedUriHandler {
 					return false
 				}
 				case "/auth/oca": {
-					console.log("SharedUriHandler: Oca Auth callback received:", { path: path })
+					Logger.info("SharedUriHandler: Oca Auth callback received")
 
 					const code = query.get("code")
 					const state = query.get("state")
@@ -78,7 +78,21 @@ export class SharedUriHandler {
 						await visibleWebview.controller.handleOcaAuthCallback(code, state)
 						return true
 					}
-					console.warn("SharedUriHandler: Missing code parameter for auth callback")
+					Logger.warn("SharedUriHandler: Missing code parameter for auth callback")
+					return false
+				}
+				// VVCode Customization: VVCode 认证回调
+				case "/vv-callback": {
+					Logger.info("SharedUriHandler: VVCode Auth callback received")
+
+					const code = query.get("code")
+					const state = query.get("state")
+
+					if (code && state) {
+						await visibleWebview.controller.handleVVAuthCallback(code, state)
+						return true
+					}
+					Logger.warn("SharedUriHandler: Missing code or state parameter for VVCode auth callback")
 					return false
 				}
 				case "/task": {

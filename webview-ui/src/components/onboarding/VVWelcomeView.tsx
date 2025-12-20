@@ -1,11 +1,13 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { useVVAuth } from "@/hooks/useVVAuth"
 import VVUsageGuideView from "./VVUsageGuideView"
 
 type OnboardingStep = "welcome" | "usageGuide"
 
 const VVWelcomeView = () => {
 	const [currentStep, setCurrentStep] = useState<OnboardingStep>("welcome")
+	const { isAuthenticated, isLoggingIn, login, user } = useVVAuth()
 
 	// 欢迎页
 	if (currentStep === "welcome") {
@@ -21,9 +23,36 @@ const VVWelcomeView = () => {
 					<h1 className="text-4xl font-extralight text-foreground mb-8 tracking-wide">VV Code</h1>
 
 					{/* 品牌介绍 - 极简文案 */}
-					<p className="text-base font-light text-foreground/60 text-center max-w-sm mb-16 leading-relaxed">
+					<p className="text-base font-light text-foreground/60 text-center max-w-sm mb-8 leading-relaxed">
 						AI 驱动的智能编程助手
 					</p>
+
+					{/* 登录状态/按钮 */}
+					{isAuthenticated && user ? (
+						<div className="mb-8 text-center">
+							<p className="text-sm text-foreground/70 mb-2">
+								欢迎回来，<span className="font-medium">{user.username}</span>
+							</p>
+						</div>
+					) : (
+						<Button
+							className="px-10 py-5 text-sm font-normal rounded-full mb-8"
+							disabled={isLoggingIn}
+							onClick={login}
+							variant="outline">
+							{isLoggingIn ? (
+								<>
+									<span className="codicon codicon-loading codicon-modifier-spin mr-2"></span>
+									正在跳转浏览器...
+								</>
+							) : (
+								<>
+									<span className="codicon codicon-sign-in mr-2"></span>
+									登录 VVCode 账号
+								</>
+							)}
+						</Button>
+					)}
 
 					{/* 开始按钮 - 简洁设计 */}
 					<Button

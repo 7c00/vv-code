@@ -4,6 +4,7 @@ import { memo, useEffect, useState } from "react"
 import ClineLogoWhite from "@/assets/ClineLogoWhite"
 import ApiOptions from "@/components/settings/ApiOptions"
 import { useExtensionState } from "@/context/ExtensionStateContext"
+import { useVVAuth } from "@/hooks/useVVAuth"
 import { AccountServiceClient, StateServiceClient } from "@/services/grpc-client"
 import { validateApiConfiguration } from "@/utils/validate"
 
@@ -12,6 +13,9 @@ const WelcomeView = memo(() => {
 	const [apiErrorMessage, setApiErrorMessage] = useState<string | undefined>(undefined)
 	const [showApiOptions, setShowApiOptions] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
+
+	// VVCode Customization: 添加 VV 认证
+	const { isAuthenticated: isVVAuthenticated, isLoggingIn: isVVLoggingIn, login: vvLogin } = useVVAuth()
 
 	const disableLetsGoButton = apiErrorMessage != null
 
@@ -22,6 +26,11 @@ const WelcomeView = memo(() => {
 			.finally(() => {
 				setIsLoading(false)
 			})
+	}
+
+	// VVCode Customization: VV 登录处理
+	const handleVVLogin = () => {
+		vvLogin()
 	}
 
 	const handleSubmit = async () => {
@@ -35,6 +44,13 @@ const WelcomeView = memo(() => {
 	useEffect(() => {
 		setApiErrorMessage(validateApiConfiguration(mode, apiConfiguration))
 	}, [apiConfiguration, mode])
+
+	// VVCode Customization: 如果已登录 VV，自动完成欢迎流程
+	useEffect(() => {
+		if (isVVAuthenticated) {
+			handleSubmit()
+		}
+	}, [isVVAuthenticated])
 
 	return (
 		<div className="fixed inset-0 p-0 flex flex-col">
@@ -58,8 +74,18 @@ const WelcomeView = memo(() => {
 					Sonnet.
 				</p>
 
-				<VSCodeButton appearance="primary" className="w-full mt-1" disabled={isLoading} onClick={handleLogin}>
-					Get Started for Free
+				{/* VVCode Customization: VVCode 登录按钮 */}
+				<VSCodeButton appearance="primary" className="w-full mt-1" disabled={isVVLoggingIn} onClick={handleVVLogin}>
+					{isVVLoggingIn ? "正在跳转浏览器..." : "使用 VVCode 账号登录"}
+					{isVVLoggingIn && (
+						<span className="ml-1 animate-spin">
+							<span className="codicon codicon-refresh"></span>
+						</span>
+					)}
+				</VSCodeButton>
+
+				<VSCodeButton appearance="secondary" className="w-full mt-1" disabled={isLoading} onClick={handleLogin}>
+					Get Started for Free (Cline Official)
 					{isLoading && (
 						<span className="ml-1 animate-spin">
 							<span className="codicon codicon-refresh"></span>

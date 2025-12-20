@@ -478,7 +478,7 @@ export const ExtensionStateContextProvider: React.FC<{
 		})
 
 		// VVCode Customization: Set up VV settings button clicked subscription
-		vvSettingsButtonClickedSubscriptionRef.current = UiServiceClient.subscribeToVVSettingsButtonClicked(
+		vvSettingsButtonClickedSubscriptionRef.current = UiServiceClient.subscribeToVvSettingsButtonClicked(
 			EmptyRequest.create({}),
 			{
 				onResponse: () => {

@@ -62,6 +62,12 @@ export async function readSecretsFromDisk(context: ExtensionContext): Promise<Se
 		aihubmixApiKey,
 		mcpOAuthSecrets,
 		nousResearchApiKey,
+		// VVCode Customization: VVCode 认证密钥
+		vvAccessToken,
+		vvRefreshToken,
+		vvUserId,
+		vvAuthState,
+		vvCodeVerifier,
 	] = await Promise.all([
 		context.secrets.get("apiKey") as Promise<Secrets["apiKey"]>,
 		context.secrets.get("openRouterApiKey") as Promise<Secrets["openRouterApiKey"]>,
@@ -107,6 +113,12 @@ export async function readSecretsFromDisk(context: ExtensionContext): Promise<Se
 		context.secrets.get("aihubmixApiKey") as Promise<Secrets["aihubmixApiKey"]>,
 		context.secrets.get("mcpOAuthSecrets") as Promise<Secrets["mcpOAuthSecrets"]>,
 		context.secrets.get("nousResearchApiKey") as Promise<Secrets["nousResearchApiKey"]>,
+		// VVCode Customization: VVCode 认证密钥
+		context.secrets.get("vv:accessToken") as Promise<Secrets["vv:accessToken"]>,
+		context.secrets.get("vv:refreshToken") as Promise<Secrets["vv:refreshToken"]>,
+		context.secrets.get("vv:userId") as Promise<Secrets["vv:userId"]>,
+		context.secrets.get("vv:authState") as Promise<Secrets["vv:authState"]>,
+		context.secrets.get("vv:codeVerifier") as Promise<Secrets["vv:codeVerifier"]>,
 	])
 
 	return {
@@ -154,6 +166,12 @@ export async function readSecretsFromDisk(context: ExtensionContext): Promise<Se
 		aihubmixApiKey,
 		mcpOAuthSecrets,
 		nousResearchApiKey,
+		// VVCode Customization: VVCode 认证密钥
+		"vv:accessToken": vvAccessToken,
+		"vv:refreshToken": vvRefreshToken,
+		"vv:userId": vvUserId,
+		"vv:authState": vvAuthState,
+		"vv:codeVerifier": vvCodeVerifier,
 	}
 }
 
@@ -725,6 +743,12 @@ export async function readGlobalStateFromDisk(context: ExtensionContext): Promis
 			openTelemetryLogMaxQueueSize: openTelemetryLogMaxQueueSize ?? 2048,
 			remoteRulesToggles: remoteRulesToggles || {},
 			remoteWorkflowToggles: remoteWorkflowToggles || {},
+			// VVCode Customization: VVCode 用户信息
+			vvUserInfo: context.globalState.get<GlobalStateAndSettings["vvUserInfo"]>("vvUserInfo"),
+			vvUserConfig: context.globalState.get<GlobalStateAndSettings["vvUserConfig"]>("vvUserConfig"),
+			// VVCode Customization: 临时认证数据
+			"vv:authState": context.globalState.get<GlobalStateAndSettings["vv:authState"]>("vv:authState"),
+			"vv:codeVerifier": context.globalState.get<GlobalStateAndSettings["vv:codeVerifier"]>("vv:codeVerifier"),
 		}
 	} catch (error) {
 		console.error("[StateHelpers] Failed to read global state:", error)
