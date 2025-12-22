@@ -8,7 +8,7 @@ import { convertApiConfigurationToProto } from "@shared/proto-conversions/models
 import { type SlashCommand } from "@shared/slashCommands"
 import { Mode } from "@shared/storage/types"
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react"
-import { AtSignIcon, PlusIcon, SettingsIcon } from "lucide-react"
+import { AtSignIcon, PlusIcon } from "lucide-react"
 import type React from "react"
 import { forwardRef, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import DynamicTextArea from "react-textarea-autosize"
@@ -1752,21 +1752,6 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 							<ClineRulesToggleModal />
 
 							<VVGroupSelector />
-
-							{/* Cline 设置入口 */}
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<VSCodeButton
-										appearance="icon"
-										aria-label="Cline Settings"
-										onClick={() => navigateToSettings()}>
-										<ButtonContainer>
-											<SettingsIcon size={13} />
-										</ButtonContainer>
-									</VSCodeButton>
-								</TooltipTrigger>
-								<TooltipContent side="top">Cline Settings</TooltipContent>
-							</Tooltip>
 
 							{/* VVCode: 旧的模型选择入口，已注释
 							<ModelContainer ref={modelSelectorRef}>
