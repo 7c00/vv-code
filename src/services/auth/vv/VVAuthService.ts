@@ -232,8 +232,13 @@ export class VVAuthService {
 				console.warn("[VVAuth] Failed to fetch user config:", error)
 			}
 
-			// 7. 获取分组配置并自动应用默认分组
+			// 7. 清除旧的 API 配置，获取分组配置并自动应用默认分组
 			try {
+				// 先清除旧的 API 配置，确保使用最新的服务器配置
+				controller.stateManager.setSecret("apiKey", undefined)
+				controller.stateManager.setGlobalState("anthropicBaseUrl", undefined)
+				controller.stateManager.setGlobalState("vvGroupConfig", undefined)
+
 				const groupConfig = await this._provider.getGroupTokens(authInfo.accessToken, authInfo.userId)
 				controller.stateManager.setGlobalState("vvGroupConfig", groupConfig)
 
@@ -465,12 +470,39 @@ export class VVAuthService {
 		try {
 			const groupConfig = await this._provider.getGroupTokens(accessToken, parseInt(userId, 10))
 			controller.stateManager.setGlobalState("vvGroupConfig", groupConfig)
+
+			// 重新应用当前默认分组的配置
+			const defaultGroup = groupConfig.find((g) => g.isDefault)
+			if (defaultGroup && defaultGroup.apiKey) {
+				await this.applyGroupConfig(defaultGroup)
+			}
+
 			await controller.stateManager.flushPendingState()
+			this.sendAuthStatusUpdate()
 			return groupConfig
 		} catch (error) {
 			console.error("[VVAuth] Failed to refresh group config:", error)
 			return undefined
 		}
+	}
+
+	/**
+	 * 重置并刷新配置
+	 * 清除旧的 API 配置缓存，重新从服务器获取最新配置
+	 */
+	public async resetAndRefreshConfig(): Promise<void> {
+		const controller = this.requireController()
+
+		// 1. 清除旧的 API 配置
+		controller.stateManager.setSecret("apiKey", undefined)
+		controller.stateManager.setGlobalState("anthropicBaseUrl", undefined)
+		controller.stateManager.setGlobalState("vvGroupConfig", undefined)
+		await controller.stateManager.flushPendingState()
+
+		// 2. 重新获取最新分组配置
+		await this.refreshGroupConfig()
+
+		console.log("[VVAuth] Config reset and refreshed")
 	}
 }
 

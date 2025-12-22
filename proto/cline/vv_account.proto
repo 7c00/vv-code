@@ -33,6 +33,9 @@ service VVAccountService {
 
   // 刷新分组配置
   rpc vvRefreshGroupConfig(EmptyRequest) returns (Empty);
+
+  // 重置并刷新配置（清除缓存后重新获取）
+  rpc vvResetAndRefreshConfig(EmptyRequest) returns (Empty);
 }
 
 // VVCode 认证状态

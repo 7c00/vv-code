@@ -3,9 +3,10 @@
 // Modified: 2025-12-20
 
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react"
-import { useCallback, useRef } from "react"
+import { useCallback, useRef, useState } from "react"
 import { useExtensionState } from "@/context/ExtensionStateContext"
 import { useVVAuth } from "@/hooks/useVVAuth"
+import { VVAccountServiceClient } from "@/services/grpc-client"
 import { getEnvironmentColor } from "@/utils/environmentColors"
 
 interface VVSettingsViewProps {
@@ -20,6 +21,19 @@ const VVSettingsView = ({ onDone }: VVSettingsViewProps) => {
 	const { user, isAuthenticated, logout } = useVVAuth()
 	const clickCountRef = useRef(0)
 	const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+	const [isRefreshing, setIsRefreshing] = useState(false)
+
+	// 获取最新配置
+	const handleRefreshConfig = useCallback(async () => {
+		setIsRefreshing(true)
+		try {
+			await VVAccountServiceClient.vvResetAndRefreshConfig({})
+		} catch (error) {
+			console.error("Failed to refresh config:", error)
+		} finally {
+			setIsRefreshing(false)
+		}
+	}, [])
 
 	// 连点5下用户名打开Cline设置
 	const handleUsernameClick = useCallback(() => {
@@ -65,14 +79,13 @@ const VVSettingsView = ({ onDone }: VVSettingsViewProps) => {
 						<div className="mb-6">
 							<h4 className="text-sm font-medium mb-3">账户</h4>
 							<div className="p-4 border border-input-border rounded bg-input-background">
-								<div className="flex items-center justify-between">
-									<div>
-										<p
-											className="text-sm font-medium cursor-pointer select-none"
-											onClick={handleUsernameClick}>
-											{user.username}
-										</p>
-									</div>
+								<p className="text-sm font-medium cursor-pointer select-none mb-3" onClick={handleUsernameClick}>
+									{user.username}
+								</p>
+								<div className="flex gap-2">
+									<VSCodeButton appearance="secondary" disabled={isRefreshing} onClick={handleRefreshConfig}>
+										{isRefreshing ? "刷新中..." : "刷新配置"}
+									</VSCodeButton>
 									<VSCodeButton appearance="secondary" onClick={logout}>
 										退出登录
 									</VSCodeButton>

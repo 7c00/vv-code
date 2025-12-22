@@ -124,6 +124,7 @@ export function VVGroupSelector({ className }: VVGroupSelectorProps) {
 
 	const currentGroup = vvGroupConfig?.find((g) => g.isDefault)
 	const hasApiKey = vvGroupConfig?.some((g) => g.apiKey) ?? false
+	const hasMissingApiKey = vvGroupConfig?.some((g) => !g.apiKey) ?? false
 
 	const handleSwitchGroup = useCallback(
 		async (groupType: string) => {
@@ -153,10 +154,10 @@ export function VVGroupSelector({ className }: VVGroupSelectorProps) {
 		return (
 			<GroupContainer className={className}>
 				<Tooltip>
-					<TooltipContent>点击创建 API Token</TooltipContent>
+					<TooltipContent>点击创建分组</TooltipContent>
 					<TooltipTrigger>
 						<GroupButton $needSetup as="a" href={VV_CREATE_TOKEN_URL} target="_blank">
-							<span>创建 Token</span>
+							<span>创建分组</span>
 							<ExternalLinkIcon size={10} />
 						</GroupButton>
 					</TooltipTrigger>
@@ -168,9 +169,13 @@ export function VVGroupSelector({ className }: VVGroupSelectorProps) {
 	return (
 		<GroupContainer className={className}>
 			<Tooltip>
-				<TooltipContent>切换分组</TooltipContent>
+				<TooltipContent>{hasMissingApiKey ? "部分分组未配置，点击切换或创建" : "切换分组"}</TooltipContent>
 				<TooltipTrigger>
-					<GroupButton $isOpen={isOpen} disabled={isSwitching} onClick={() => setIsOpen(!isOpen)}>
+					<GroupButton
+						$isOpen={isOpen}
+						$needSetup={hasMissingApiKey}
+						disabled={isSwitching}
+						onClick={() => setIsOpen(!isOpen)}>
 						<span>{currentGroup?.name || "选择分组"}</span>
 						<ChevronDownIcon size={12} />
 					</GroupButton>
@@ -189,6 +194,12 @@ export function VVGroupSelector({ className }: VVGroupSelectorProps) {
 							{group.isDefault && <ActiveIndicator />}
 						</GroupOption>
 					))}
+					{hasMissingApiKey && (
+						<SetupLink href={VV_CREATE_TOKEN_URL} rel="noreferrer" target="_blank">
+							<span>创建分组</span>
+							<ExternalLinkIcon size={10} />
+						</SetupLink>
+					)}
 				</GroupDropdown>
 			)}
 		</GroupContainer>

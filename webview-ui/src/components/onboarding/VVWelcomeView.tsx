@@ -1,13 +1,20 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { useExtensionState } from "@/context/ExtensionStateContext"
 import { useVVAuth } from "@/hooks/useVVAuth"
 import VVUsageGuideView from "./VVUsageGuideView"
+
+const VV_CREATE_TOKEN_URL = "https://vvcode.top/console/start"
 
 type OnboardingStep = "welcome" | "usageGuide"
 
 const VVWelcomeView = () => {
 	const [currentStep, setCurrentStep] = useState<OnboardingStep>("welcome")
 	const { isAuthenticated, isLoggingIn, login, user } = useVVAuth()
+	const { vvGroupConfig } = useExtensionState()
+
+	// 检查是否有可用的 API Key
+	const hasApiKey = vvGroupConfig?.some((g) => g.apiKey) ?? false
 
 	// 欢迎页
 	if (currentStep === "welcome") {
@@ -33,6 +40,17 @@ const VVWelcomeView = () => {
 							<p className="text-sm text-foreground/70 mb-2">
 								欢迎回来，<span className="font-medium">{user.username}</span>
 							</p>
+							{!hasApiKey && (
+								<a
+									className="inline-flex items-center gap-1 text-sm text-[var(--vscode-textLink-foreground)] hover:underline"
+									href={VV_CREATE_TOKEN_URL}
+									rel="noreferrer"
+									target="_blank">
+									<span className="codicon codicon-key mr-1"></span>
+									创建分组以开始使用
+									<span className="codicon codicon-link-external text-xs"></span>
+								</a>
+							)}
 						</div>
 					) : (
 						<Button
@@ -54,13 +72,15 @@ const VVWelcomeView = () => {
 						</Button>
 					)}
 
-					{/* 开始按钮 - 简洁设计 */}
-					<Button
-						className="px-12 py-6 text-base font-normal rounded-full"
-						onClick={() => setCurrentStep("usageGuide")}
-						variant="default">
-						开始体验
-					</Button>
+					{/* 开始按钮 - 需要登录且有 API Key 才显示 */}
+					{isAuthenticated && hasApiKey && (
+						<Button
+							className="px-12 py-6 text-base font-normal rounded-full"
+							onClick={() => setCurrentStep("usageGuide")}
+							variant="default">
+							开始体验
+						</Button>
+					)}
 				</div>
 			</div>
 		)
