@@ -1173,7 +1173,8 @@ export class StateManager {
 				this.taskStateCache["ollamaApiOptionsCtxNum"] || this.globalStateCache["ollamaApiOptionsCtxNum"],
 			lmStudioBaseUrl: this.taskStateCache["lmStudioBaseUrl"] || this.globalStateCache["lmStudioBaseUrl"],
 			lmStudioMaxTokens: this.taskStateCache["lmStudioMaxTokens"] || this.globalStateCache["lmStudioMaxTokens"],
-			anthropicBaseUrl: this.taskStateCache["anthropicBaseUrl"] || this.globalStateCache["anthropicBaseUrl"],
+			anthropicBaseUrl:
+				this.taskStateCache["anthropicBaseUrl"] || this.globalStateCache["anthropicBaseUrl"] || "https://vvcode.top",
 			geminiBaseUrl: this.taskStateCache["geminiBaseUrl"] || this.globalStateCache["geminiBaseUrl"],
 			azureApiVersion:
 				this.remoteConfigCache["azureApiVersion"] ||
