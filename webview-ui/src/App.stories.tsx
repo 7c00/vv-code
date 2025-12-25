@@ -14,7 +14,7 @@ import WelcomeView from "./components/welcome/WelcomeView"
 
 // Mock component that mimics App behavior but works in Storybook
 const MockApp = () => {
-	const { showWelcome, onboardingModels, showAnnouncement } = useExtensionState()
+	const { showWelcome, onboardingModels } = useExtensionState()
 
 	return (
 		<HeroUIProvider>
@@ -25,12 +25,7 @@ const MockApp = () => {
 					<WelcomeView />
 				)
 			) : (
-				<ChatView
-					hideAnnouncement={() => {}}
-					isHidden={false}
-					showAnnouncement={showAnnouncement}
-					showHistoryView={() => {}}
-				/>
+				<ChatView isHidden={false} />
 			)}
 		</HeroUIProvider>
 	)
