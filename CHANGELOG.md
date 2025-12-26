@@ -1,5 +1,19 @@
 # VVCode Changelog
 
+## [1.0.10] - 2025-12-26
+
+### Changed
+- 重构认证回调 URL 生成逻辑，使用 HostProvider 动态获取
+
+## [1.0.9] - 2025-12-26
+
+### Changed
+- 更新欢迎页面公告内容
+- 同步上游 Cline v3.46.0 更新
+
+### Fixed
+- 修复 vite base path 配置
+
 ## [1.0.7] - 2025-12-24
 
 ### Fixed
