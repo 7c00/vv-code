@@ -3,6 +3,7 @@
 
 import type { Controller } from "@/core/controller"
 import type { StreamingResponseHandler } from "@/core/controller/grpc-handler"
+import { HostProvider } from "@/hosts/host-provider"
 import type { VVGroupConfig, VVGroupItem, VVUserConfig, VVUserInfo } from "@/shared/storage/state-keys"
 import { generateCodeChallenge, generateCodeVerifier, generateState } from "@/shared/vv-crypto"
 import { openExternal } from "@/utils/env"
@@ -151,8 +152,9 @@ export class VVAuthService {
 			throw new Error("Failed to save authentication state. Please try again.")
 		}
 
-		// 5. 构建回调 URI
-		const callbackUri = `vscode://${this.PUBLISHER}.${this.EXTENSION_ID}/vv-callback`
+		// 5. 构建回调 URI（使用 HostProvider 获取回调 URL）
+		const callbackHost = await HostProvider.get().getCallbackUrl()
+		const callbackUri = `${callbackHost}/vv-callback`
 
 		// 6. 构建授权 URL
 		const authUrl = new URL(this.AUTH_PAGE_URL)
