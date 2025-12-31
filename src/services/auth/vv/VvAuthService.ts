@@ -4,7 +4,7 @@
 import type { Controller } from "@/core/controller"
 import type { StreamingResponseHandler } from "@/core/controller/grpc-handler"
 import { HostProvider } from "@/hosts/host-provider"
-import type { VvGroupConfig, VvGroupItem, VvUserConfig, VvUserInfo } from "@/shared/storage/state-keys"
+import type { VvGroupConfig, VvGroupItem, VvGroupType, VvUserConfig, VvUserInfo } from "@/shared/storage/state-keys"
 import { generateCodeChallenge, generateCodeVerifier, generateState } from "@/shared/vv-crypto"
 import { openExternal } from "@/utils/env"
 import { type VvAuthInfo, VvAuthProvider } from "./providers/VvAuthProvider"
@@ -269,10 +269,16 @@ export class VvAuthService {
 
 				controller.stateManager.setGlobalState("vvGroupConfig", groupConfig)
 
-				// 自动应用默认分组的 API Key
-				const defaultGroup = groupConfig.find((g) => g.isDefault)
-				if (defaultGroup && defaultGroup.apiKey) {
-					await this.applyGroupConfig(defaultGroup)
+				// 选择并应用分组配置
+				const groupToApply = this.selectGroupToApply(groupConfig)
+				if (groupToApply) {
+					await this.applyGroupConfig(groupToApply)
+
+					// 只在用户没有选择过分组时，才设置默认值（首次登录）
+					const currentSelection = controller.stateManager.getGlobalStateKey("vvSelectedGroupType")
+					if (!currentSelection) {
+						controller.stateManager.setGlobalState("vvSelectedGroupType", groupToApply.type as VvGroupType)
+					}
 				}
 			} catch (error) {
 				console.warn("[VVAuth] Failed to fetch group config:", error)
@@ -453,12 +459,39 @@ export class VvAuthService {
 		}))
 		controller.stateManager.setGlobalState("vvGroupConfig", updatedConfig)
 
+		// 保存用户选中的分组类型，用于刷新后恢复选中状态
+		controller.stateManager.setGlobalState("vvSelectedGroupType", groupType as VvGroupType)
+
 		// 应用分组配置
 		await this.applyGroupConfig(targetGroup)
 
 		// 持久化并广播状态更新
 		await controller.stateManager.flushPendingState()
 		this.sendAuthStatusUpdate()
+	}
+
+	/**
+	 * 根据用户选择和默认配置决定应该使用哪个分组
+	 * @param groupConfig 分组配置列表
+	 * @returns 应该使用的分组，如果没有可用分组则返回 undefined
+	 */
+	private selectGroupToApply(groupConfig: VvGroupConfig): VvGroupItem | undefined {
+		const controller = this.requireController()
+
+		// 获取用户上次选中的分组类型
+		const selectedGroupType = controller.stateManager.getGlobalStateKey("vvSelectedGroupType")
+
+		// 如果有上次选中的分组，优先使用该分组；否则使用服务器返回的默认分组
+		if (selectedGroupType) {
+			const selectedGroup = groupConfig.find((g) => g.type === selectedGroupType)
+			// 只有当上次选中的分组存在且有 apiKey 时，才使用该分组
+			if (selectedGroup && selectedGroup.apiKey) {
+				return selectedGroup
+			}
+		}
+
+		// 如果没有保存的选择或选择无效，使用默认分组
+		return groupConfig.find((g) => g.isDefault && g.apiKey)
 	}
 
 	/**
@@ -505,6 +538,7 @@ export class VvAuthService {
 
 		try {
 			const groupConfig = await this._provider.getGroupTokens(accessToken, parseInt(userId, 10))
+
 			controller.stateManager.setGlobalState("vvGroupConfig", groupConfig)
 
 			// 检查是否还有空的 apiKey
@@ -516,10 +550,16 @@ export class VvAuthService {
 				controller.stateManager.setGlobalState("vvNeedsWebInit", undefined)
 			}
 
-			// 重新应用当前默认分组的配置
-			const defaultGroup = groupConfig.find((g) => g.isDefault)
-			if (defaultGroup && defaultGroup.apiKey) {
-				await this.applyGroupConfig(defaultGroup)
+			// 选择并应用分组配置
+			const groupToApply = this.selectGroupToApply(groupConfig)
+			if (groupToApply) {
+				await this.applyGroupConfig(groupToApply)
+
+				// 只在用户没有选择过分组时，才设置默认值
+				const currentSelection = controller.stateManager.getGlobalStateKey("vvSelectedGroupType")
+				if (!currentSelection) {
+					controller.stateManager.setGlobalState("vvSelectedGroupType", groupToApply.type as VvGroupType)
+				}
 			}
 
 			await controller.stateManager.flushPendingState()

@@ -69,6 +69,8 @@ export async function readSecretsFromDisk(context: ExtensionContext): Promise<Se
 		vvUserId,
 		vvAuthState,
 		vvCodeVerifier,
+		// VVCode Customization: Inline completion API key
+		vvCompletionApiKey,
 	] = await Promise.all([
 		context.secrets.get("apiKey") as Promise<Secrets["apiKey"]>,
 		context.secrets.get("openRouterApiKey") as Promise<Secrets["openRouterApiKey"]>,
@@ -120,6 +122,8 @@ export async function readSecretsFromDisk(context: ExtensionContext): Promise<Se
 		context.secrets.get("vv:userId") as Promise<Secrets["vv:userId"]>,
 		context.secrets.get("vv:authState") as Promise<Secrets["vv:authState"]>,
 		context.secrets.get("vv:codeVerifier") as Promise<Secrets["vv:codeVerifier"]>,
+		// VVCode Customization: Inline completion API key
+		context.secrets.get("vv:completionApiKey") as Promise<Secrets["vv:completionApiKey"]>,
 	])
 
 	return {
@@ -173,6 +177,8 @@ export async function readSecretsFromDisk(context: ExtensionContext): Promise<Se
 		"vv:userId": vvUserId,
 		"vv:authState": vvAuthState,
 		"vv:codeVerifier": vvCodeVerifier,
+		// VVCode Customization: Inline completion API key
+		"vv:completionApiKey": vvCompletionApiKey,
 	}
 }
 
@@ -754,10 +760,23 @@ export async function readGlobalStateFromDisk(context: ExtensionContext): Promis
 			vvUserInfo: context.globalState.get<GlobalStateAndSettings["vvUserInfo"]>("vvUserInfo"),
 			vvUserConfig: context.globalState.get<GlobalStateAndSettings["vvUserConfig"]>("vvUserConfig"),
 			vvGroupConfig: context.globalState.get<GlobalStateAndSettings["vvGroupConfig"]>("vvGroupConfig"),
+			vvSelectedGroupType: context.globalState.get<GlobalStateAndSettings["vvSelectedGroupType"]>("vvSelectedGroupType"),
 			vvNeedsWebInit: context.globalState.get<GlobalStateAndSettings["vvNeedsWebInit"]>("vvNeedsWebInit"),
 			// VVCode Customization: 临时认证数据
 			"vv:authState": context.globalState.get<GlobalStateAndSettings["vv:authState"]>("vv:authState"),
 			"vv:codeVerifier": context.globalState.get<GlobalStateAndSettings["vv:codeVerifier"]>("vv:codeVerifier"),
+			// VVCode Customization: Inline completion settings
+			vvInlineCompletionEnabled:
+				context.globalState.get<GlobalStateAndSettings["vvInlineCompletionEnabled"]>("vvInlineCompletionEnabled"),
+			vvInlineCompletionProvider:
+				context.globalState.get<GlobalStateAndSettings["vvInlineCompletionProvider"]>("vvInlineCompletionProvider"),
+			vvInlineCompletionModelId:
+				context.globalState.get<GlobalStateAndSettings["vvInlineCompletionModelId"]>("vvInlineCompletionModelId"),
+			vvInlineCompletionDebounceMs:
+				context.globalState.get<GlobalStateAndSettings["vvInlineCompletionDebounceMs"]>("vvInlineCompletionDebounceMs"),
+			vvInlineCompletionUseGroupApiKey: context.globalState.get<GlobalStateAndSettings["vvInlineCompletionUseGroupApiKey"]>(
+				"vvInlineCompletionUseGroupApiKey",
+			),
 		}
 	} catch (error) {
 		console.error("[StateHelpers] Failed to read global state:", error)

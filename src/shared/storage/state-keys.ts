@@ -63,7 +63,14 @@ export interface GlobalState {
 	vvUserInfo: VvUserInfo | undefined
 	vvUserConfig: VvUserConfig | undefined
 	vvGroupConfig: VvGroupConfig | undefined // VVCode 分组配置
+	vvSelectedGroupType: VvGroupType | undefined // VVCode 用户上次选中的分组类型
 	vvNeedsWebInit: boolean | undefined // VVCode 需要去 web 端初始化配置
+	// VVCode Customization: Inline completion settings
+	vvInlineCompletionEnabled: boolean | undefined
+	vvInlineCompletionProvider: string | undefined
+	vvInlineCompletionModelId: string | undefined
+	vvInlineCompletionDebounceMs: number | undefined
+	vvInlineCompletionUseGroupApiKey: boolean | undefined
 	// VVCode Customization: 临时认证数据（仅在认证流程中使用）
 	"vv:authState": string | undefined
 	"vv:codeVerifier": string | undefined
@@ -323,6 +330,8 @@ export interface Secrets {
 	"vv:userId": string | undefined // VVCode 用户 ID
 	"vv:authState": string | undefined // CSRF 防护 state（临时）- 已迁移到 GlobalState
 	"vv:codeVerifier": string | undefined // PKCE code_verifier（临时）- 已迁移到 GlobalState
+	// VVCode Customization: Inline completion API key
+	"vv:completionApiKey": string | undefined
 }
 
 export interface LocalState {

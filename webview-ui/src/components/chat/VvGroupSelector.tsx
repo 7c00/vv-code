@@ -118,11 +118,15 @@ interface VvGroupSelectorProps {
 }
 
 export function VvGroupSelector({ className }: VvGroupSelectorProps) {
-	const { vvGroupConfig } = useExtensionState()
+	const { vvGroupConfig, vvSelectedGroupType } = useExtensionState()
 	const [isOpen, setIsOpen] = useState(false)
 	const [isSwitching, setIsSwitching] = useState(false)
 
-	const currentGroup = vvGroupConfig?.find((g) => g.isDefault)
+	// 优先使用用户选中的分组，如果没有则使用默认分组
+	const currentGroup = vvSelectedGroupType
+		? vvGroupConfig?.find((g) => g.type === vvSelectedGroupType)
+		: vvGroupConfig?.find((g) => g.isDefault)
+
 	const hasApiKey = vvGroupConfig?.some((g) => g.apiKey) ?? false
 	const hasMissingApiKey = vvGroupConfig?.some((g) => !g.apiKey) ?? false
 
@@ -184,16 +188,21 @@ export function VvGroupSelector({ className }: VvGroupSelectorProps) {
 
 			{isOpen && (
 				<GroupDropdown>
-					{vvGroupConfig.map((group) => (
-						<GroupOption
-							$isActive={group.isDefault}
-							disabled={!group.apiKey || isSwitching}
-							key={group.type}
-							onClick={() => handleSwitchGroup(group.type)}>
-							<GroupLabel>{group.name}</GroupLabel>
-							{group.isDefault && <ActiveIndicator />}
-						</GroupOption>
-					))}
+					{vvGroupConfig.map((group) => {
+						// 判断当前分组是否被选中：优先使用 vvSelectedGroupType，否则使用 isDefault
+						const isActive = vvSelectedGroupType ? group.type === vvSelectedGroupType : group.isDefault
+
+						return (
+							<GroupOption
+								$isActive={isActive}
+								disabled={!group.apiKey || isSwitching}
+								key={group.type}
+								onClick={() => handleSwitchGroup(group.type)}>
+								<GroupLabel>{group.name}</GroupLabel>
+								{isActive && <ActiveIndicator />}
+							</GroupOption>
+						)
+					})}
 					{hasMissingApiKey && (
 						<SetupLink href={VV_CREATE_TOKEN_URL} rel="noreferrer" target="_blank">
 							<span>创建分组</span>

@@ -8,6 +8,7 @@ import { useExtensionState } from "@/context/ExtensionStateContext"
 import { useVvAuth } from "@/hooks/useVvAuth"
 import { VvAccountServiceClient } from "@/services/grpc-client"
 import { getEnvironmentColor } from "@/utils/environmentColors"
+import { VvCompletionSettings } from "./VvCompletionSettings"
 
 interface VvSettingsViewProps {
 	onDone: () => void
@@ -152,6 +153,11 @@ const VvSettingsView = ({ onDone }: VvSettingsViewProps) => {
 							</div>
 						</div>
 					)}
+
+					{/* 代码补全设置 */}
+					<div className="mb-6">
+						<VvCompletionSettings />
+					</div>
 
 					<p
 						style={{

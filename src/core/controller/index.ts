@@ -1000,6 +1000,7 @@ export class Controller {
 			// VVCode Customization: 分组配置
 			vvGroupConfig: this.stateManager.getGlobalStateKey("vvGroupConfig"),
 			vvNeedsWebInit: this.stateManager.getGlobalStateKey("vvNeedsWebInit"),
+			vvSelectedGroupType: this.stateManager.getGlobalStateKey("vvSelectedGroupType"),
 		}
 	}
 

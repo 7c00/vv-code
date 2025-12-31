@@ -110,6 +110,7 @@ export interface ExtensionState {
 	// VVCode Customization: 分组配置
 	vvGroupConfig?: VvGroupConfig
 	vvNeedsWebInit?: boolean // 需要去 web 端初始化配置
+	vvSelectedGroupType?: string // 用户选中的分组类型
 }
 
 export interface ClineMessage {

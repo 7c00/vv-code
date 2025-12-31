@@ -1,0 +1,30 @@
+// VVCode Customization: VVCode 代码补全服务
+// Created: 2025-12-29
+
+syntax = "proto3";
+
+package cline;
+
+import "cline/common.proto";
+
+option go_package = "github.com/cline/grpc-go/cline";
+option java_multiple_files = true;
+option java_package = "bot.cline.proto";
+
+// VVCode 代码补全服务
+service VvCompletionService {
+  // 更新补全配置
+  rpc vvUpdateCompletionSettings(VvCompletionSettings) returns (Empty);
+
+  // 获取补全配置
+  rpc vvGetCompletionSettings(EmptyRequest) returns (VvCompletionSettings);
+}
+
+// 补全配置
+message VvCompletionSettings {
+  bool enabled = 1; // 是否启用补全
+  string provider = 2; // Provider（如 "anthropic", "openai"）
+  string model_id = 3; // 模型 ID
+  int32 debounce_ms = 4; // Debounce 延迟（毫秒）
+  bool use_group_api_key = 5; // 是否复用分组 API Key
+}
