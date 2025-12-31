@@ -84,7 +84,7 @@ export class VvCompletionProvider implements vscode.InlineCompletionItemProvider
 
 			// Note: API uses "FIM" as the model name for completion
 			// But we need to know the actual model type for template selection
-			const actualModelType = "deepseek-coder"
+			const actualModelType = "qwen"
 			const apiModelName = "FIM"
 
 			// Create helper variables (caches commonly used data)
